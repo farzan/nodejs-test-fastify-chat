@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatrootm</title>
+</head>
+<body>
+    <div id="messages"></div>
+
+    <input id="message" type="text" value="">
+    <button id="send" type="button">Send</button>
+
+    <script>
+        class WSConnection {
+            ws;
+            connect() {
+                this.ws = new WebSocket('ws://localhost:3000/ws');
+                this.ws.addEventListener('message', (event) => {
+                    const payload = JSON.parse(event.data);
+                    console.log('data:', payload);
+                    const domEl = document.createElement('div');
+                    const content = document.createTextNode(payload.payload.text);
+                    domEl.appendChild(content);
+                    document.getElementById('messages')
+                        .appendChild(domEl);
+                });
+            }
+
+            send(message) {
+                const messagePayload = {
+                    type: 'message',
+                    payload: {
+                        text: message,
+                    }
+                };
+                this.ws.send(JSON.stringify(messagePayload));
+            }
+        }
+
+        ws = new WSConnection;
+        ws.connect();
+
+        document.getElementById('send').addEventListener('click', () => {
+            const input = document.getElementById('message');
+            const message = input.value;
+            console.log('value:', message);
+            ws.send(message)
+        });
+    </script>
+</body>
+</html>
