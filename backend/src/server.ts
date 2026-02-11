@@ -11,10 +11,16 @@ const fastify = Fastify({
 });
 
 const __path = dirname(fileURLToPath(import.meta.url));
-
-await fastify.register(fastifyStatic, { root: join(__path, 'views') });
+await fastify.register(fastifyStatic, {
+  root: join(__path, '../../frondend/dist'),
+});
 await fastify.register(fastifyWebsocket);
 await fastify.register(wsManager);
+
+// @TODO: how to enable default page?
+// await fastify.get('/*', (_, reply) => {
+//   reply.sendFile('index.html')
+// })
 
 try {
   fastify.listen({port: 3000});
