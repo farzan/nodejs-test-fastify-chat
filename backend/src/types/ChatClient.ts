@@ -1,6 +1,8 @@
+import type { Room } from '@shared/types/Room.js';
 import { WebSocket } from 'ws';
 
 export type ChatClient = {
-  name: string,
+  username: string,
+  room: Room,
   connection: WebSocket,
 }

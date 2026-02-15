@@ -1,18 +1,18 @@
-import type { Message } from "@shared/types/Messages";
+import type { TextMessage } from "@shared/types/Messages";
 
-function formatMessage(message: Message, key: number) {
+function formatMessage(message: TextMessage, key: number) {
   return <li key={key}>
     {message.sender}: {message.payload.text}
   </li>;
 }
 
 interface MessageListProps {
-  messages: Message[];
+  messages: TextMessage[];
 }
 
 export default function MessageList({messages}: MessageListProps) {
   let key = 0;
-  const messageFormatted = messages.map((message: Message) => formatMessage(message, key++))
+  const messageFormatted = messages.map((message: TextMessage) => formatMessage(message, key++))
   return <ul>
     {messageFormatted}
   </ul>;
