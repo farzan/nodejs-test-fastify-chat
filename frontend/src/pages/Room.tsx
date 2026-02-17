@@ -54,12 +54,21 @@ export default function Chat() {
       const message = MessageSchema.parse(JSON.parse(e.data));
       console.log('message object:', message);
 
-      if (message.type === 'message') {
-        setMessageList(prev => [...prev, message as TextMessage]);
-        console.log(messageList);
-      } else if (message.type === 'room_info') {
-        const roomInfo: RoomInfo = message;
-        setRoom(roomInfo.payload.room);
+      switch (message.type) {
+        case 'message':
+          setMessageList(prev => [...prev, message as TextMessage]);
+          console.log(messageList);
+          break;
+        case 'room_info':
+          const roomInfo: RoomInfo = message;
+          setRoom(roomInfo.payload.room);
+          break;
+        case 'error':
+          console.log(`Error: ${message.payload.error}`);
+
+          break;
+        default:
+          console.log('Error: Unknown message');
       }
     };
     ws.onclose = () => console.log('WS connection closed');

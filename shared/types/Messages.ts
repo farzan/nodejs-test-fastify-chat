@@ -22,3 +22,10 @@ export type RoomInfo = {
     room: Room,
   }
 }
+
+export type Error = {
+  type: 'error',
+  payload: {
+    error: string,
+  }
+}

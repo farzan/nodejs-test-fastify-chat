@@ -6,6 +6,9 @@ import fastifyWebsocket from '@fastify/websocket';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 
 import routes from './routes/routes.js';
+import { InMemoryRoomRepository } from './repositories/room.repository.memory.js';
+import { createRoomService } from './services/room.service.js';
+import { ChatRegistry } from './services/chat.registry.js';
 
 const fastify = Fastify({
   logger: true,
@@ -19,6 +22,17 @@ await fastify.register(fastifyStatic, {
 });
 await fastify.register(fastifyWebsocket);
 await fastify.register(routes);
+
+// Decorators:
+const roomRepository = new InMemoryRoomRepository();
+const roomService = createRoomService({
+  roomRepository,
+});
+fastify.decorate('roomService', roomService);
+
+const chatRegistry = new ChatRegistry(roomService);
+fastify.decorate('chatRegistry', chatRegistry);
+
 
 // @TODO: how to enable default page?
 // await fastify.get('/*', (_, reply) => {
