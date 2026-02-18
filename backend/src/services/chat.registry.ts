@@ -1,7 +1,7 @@
 import { WebSocket } from "ws";
 import type { RoomService } from "./room.service.js";
 import type { ChatClient } from "@/types/ChatClient.js";
-import type { Error, RoomInfo as RoomInfoMessage, TextMessage } from "@shared/types/Messages.js";
+import type { ErrorMessage, RoomInfoMessage as RoomInfoMessage, TextMessage } from "@shared/types/Messages.js";
 
 export class ChatRegistry {
   private rooms = new Map<number, Set<ChatClient>>();
@@ -26,7 +26,7 @@ export class ChatRegistry {
       websocket.on('message', (message: Buffer) => this.handleIncomingMessage(roomId, message));
     } catch(err) {
       if (websocket.readyState === WebSocket.OPEN) {
-        const errorMessage: Error = {
+        const errorMessage: ErrorMessage = {
           type: "error",
           payload: {
             error: err.message,

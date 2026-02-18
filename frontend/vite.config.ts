@@ -22,7 +22,9 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: path => {
-          return path.replace(/^\/ws/, '')
+          const newPath = path.replace(/^\/ws/, '');
+          console.log('Proxy:', path, '→', 'ws://localhost:3000' + newPath);
+          return newPath
         }
       },
     }

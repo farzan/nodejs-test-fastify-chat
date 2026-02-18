@@ -10,22 +10,30 @@ export const TextMessageSchema = z.object({
   }),
 });
 
-export const RoomInfoSchema = z.object({
+export const RoomInfoMessageSchema = z.object({
   type: z.literal('room_info'),
   payload: z.object({
     room: RoomSchema,
   }),
 })
 
-export const ErrorSchema = z.object({
+export const ErrorMessageSchema = z.object({
   type: z.literal('error'),
   payload: z.object({
     error: z.string(),
   }),
 });
 
+export const NewRoomMessageSchema = z.object({
+  type: z.literal('new_room'),
+  payload: z.object({
+    room: RoomSchema,
+  }),
+});
+
 export const MessageSchema = z.discriminatedUnion('type', [
   TextMessageSchema,
-  RoomInfoSchema,
-  ErrorSchema,
+  RoomInfoMessageSchema,
+  ErrorMessageSchema,
+  NewRoomMessageSchema,
 ]);

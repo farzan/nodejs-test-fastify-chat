@@ -16,16 +16,23 @@ export type TextMessage = {
   }
 }
 
-export type RoomInfo = {
+export type RoomInfoMessage = {
   type: "room_info",
   payload: {
     room: Room,
   }
 }
 
-export type Error = {
+export type ErrorMessage = {
   type: 'error',
   payload: {
     error: string,
+  }
+}
+
+export type NewRoomMessage = {
+  type: 'new_room',
+  payload: {
+    room: Room,
   }
 }

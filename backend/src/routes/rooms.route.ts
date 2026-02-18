@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import type { FastifyRequest, FastifyInstance, FastifyReply } from 'fastify';
-import type { Error } from '@shared/types/Messages.js';
+import type { ErrorMessage } from '@shared/types/Messages.js';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { toError } from '@/helpers.js';
@@ -62,7 +62,7 @@ export default function(fastify: FastifyInstance) {
         fastify.chatRegistry.connectClient(roomId, name, websocket);
       } catch (err) {
         if (websocket.readyState === WebSocket.OPEN) {
-          const errorMessage: Error = {
+          const errorMessage: ErrorMessage = {
             type: 'error',
             payload: {
               error: toError(err).message,

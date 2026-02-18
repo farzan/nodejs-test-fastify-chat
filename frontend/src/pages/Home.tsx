@@ -1,8 +1,10 @@
 import type { Room } from '@shared/types/Room';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Rooms from '@/components/home/RoomList.js';
 import type { OnRoomClick } from '@/components/home/RoomList.js';
+import { MessageSchema } from '@shared/types/MessageSchemas';
+import type { NewRoomMessage } from '@shared/types/Messages';
 
 export default function Home() {
   const [username, setUsername] = useState<string>('');
@@ -23,16 +25,56 @@ export default function Home() {
     try {
       const res = await fetch('/api/rooms');
       const rooms: Room[] = await res.json();
+      await sortRooms(rooms);
       console.log(rooms);
       setRooms(rooms);
-    } catch (er) {
-      console.error('Could not fetch room list:', er);
+    } catch (err) {
+      console.error('Could not fetch room list:', err);
     }
+  }
+
+  async function sortRooms(rooms: Room[]) {
+    rooms.sort((a, b) => a.title.localeCompare(b.title));
   }
 
   useEffect(() => {
     updateRoomList();
   }, []);
+
+  const wsRef = useRef<WebSocket | null>(null);
+  useEffect(() => {
+    const ws = new WebSocket(`ws://localhost:5173/ws/home/events`);
+    wsRef.current = ws;
+
+    ws.onopen = () => console.log('Home WS opened');
+    ws.onmessage = (e: MessageEvent) => {
+      console.log('New room created:', e.data);
+      try {
+        const message = MessageSchema.parse(JSON.parse(e.data));
+        console.log('message object:', message);
+        switch(message.type) {
+          case 'new_room':
+            handleNewRoomMessage(message);
+            break;
+          default:
+            console.log(`Unknown message: ${e.data}`);
+        }
+      } catch (err) {
+        console.log(`Error: ${err}`);
+      }
+    };
+
+    return () => ws.close();
+  }, []);
+
+  function handleNewRoomMessage(message: NewRoomMessage) {
+    setRooms((prev: Room[]) => {
+      const updated = [...prev, message.payload.room];
+      sortRooms(updated);
+
+      return updated;
+    });
+  }
 
   const handleRoomClick: OnRoomClick = (room: Room) => {
     if (isEnterDisabled) {

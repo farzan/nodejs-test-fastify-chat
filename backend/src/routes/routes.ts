@@ -1,6 +1,9 @@
 import type { FastifyReply, FastifyInstance } from 'fastify';
 import RoomRoutes from '@/routes/rooms.route.js';
 import type { WebSocket } from 'ws';
+import * as events from "@/types/events.js";
+import type { NewRoomMessage } from '@shared/types/Messages.js';
+import type { Room } from '@shared/types/Room.js';
 
 export default async function(fastify: FastifyInstance) {
   await fastify.register(RoomRoutes);
@@ -15,7 +18,27 @@ export default async function(fastify: FastifyInstance) {
       websocket: true,
     },
     async function homeEventsWS(websocket: WebSocket) {
-      // @TODO
+      const onNewRoomCallback = (room: Room) => {
+        const newRoomMessage: NewRoomMessage = {
+          type: 'new_room',
+          payload: {
+            room,
+          }
+        }
+
+        websocket.send(JSON.stringify(newRoomMessage));
+        console.log('New room message sent');
+
+      };
+      fastify.eventBus.on(events.ROOM_CREATED, onNewRoomCallback);
+
+      const offCallback = () => {
+        console.log('Removing new room callback');
+
+        fastify.eventBus.off(events.ROOM_CREATED, onNewRoomCallback);
+      }
+      websocket.on('close', offCallback);
+      websocket.on('error', offCallback);
     }
   );
 }

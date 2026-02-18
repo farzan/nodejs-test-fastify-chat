@@ -1,11 +1,14 @@
 import type { RoomRepository } from "@/repositories/room.repository.js";
 import type { Room } from "@shared/types/Room.js";
+import type EventEmitter from "events";
+import * as events from "@/types/events.js";
 
 export type RoomService = ReturnType<typeof createRoomService>;
 
 export function createRoomService(
   deps: {
     roomRepository: RoomRepository,
+    eventBus: EventEmitter,
   }
 ) {
   return {
@@ -26,7 +29,10 @@ export function createRoomService(
     async createRoom(title: string): Promise<Room> {
       const room = { title };
 
-      return deps.roomRepository.createRoom(room);
+      const newRoom = await deps.roomRepository.createRoom(room);
+      deps.eventBus.emit(events.ROOM_CREATED, newRoom);
+
+      return newRoom;
     }
   }
 }
